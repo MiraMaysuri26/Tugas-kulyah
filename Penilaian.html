@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pengelolaan Nilai Mahasiswa</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="text"], input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        #ipkResult {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Pengelolaan Nilai Mahasiswa</h1>
+
+    <form id="nilaiForm">
+        <div class="form-group">
+            <label for="nim">NIM:</label>
+            <input type="text" id="nim" name="nim" required>
+        </div>
+        <div class="form-group">
+            <label for="nama">Nama Mahasiswa:</label>
+            <input type="text" id="nama" name="nama" required>
+        </div>
+        <div class="form-group">
+            <label for="mataKuliah">Mata Kuliah:</label>
+            <input type="text" id="mataKuliah" name="mataKuliah" required>
+        </div>
+        <div class="form-group">
+            <label for="sks">SKS:</label>
+            <input type="number" id="sks" name="sks" required>
+        </div>
+        <div class="form-group">
+            <label for="nilai">Nilai:</label>
+            <input type="number" id="nilai" name="nilai" required>
+        </div>
+        <button type="button" onclick="tambahNilai()">Tambah Nilai</button>
+    </form>
+
+    <h2>Daftar Nilai Mahasiswa</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>NIM</th>
+                <th>Nama</th>
+                <th>Mata Kuliah</th>
+                <th>SKS</th>
+                <th>Nilai</th>
+                <th>Angka Kualitas</th>
+                <th>Grade</th>
+            </tr>
+        </thead>
+        <tbody id="nilaiTableBody">
+            <!-- Data nilai akan ditambahkan di sini -->
+        </tbody>
+    </table>
+
+    <script>
+        let totalNilai = 0;
+        let totalSKS = 0;
+
+        function tambahNilai() {
+            // Ambil data dari form
+            var nim = document.getElementById('nim').value;
+            var nama = document.getElementById('nama').value;
+            var mataKuliah = document.getElementById('mataKuliah').value;
+            var sks = parseInt(document.getElementById('sks').value);
+            var nilai = parseFloat(document.getElementById('nilai').value);
+
+            // Validasi input
+            if (nim === '' || nama === '' || mataKuliah === '' || isNaN(sks) || isNaN(nilai)) {
+                alert('Semua bidang harus diisi dengan benar!');
+                return;
+            }
+
+            // Hitung angka kualitas (nilai * SKS)
+            var angkaKualitas = nilai * sks;
+
+            // Tambahkan data ke total
+            totalNilai += angkaKualitas;
+            totalSKS += sks;
+
+            // Tentukan grade
+            var grade = getGrade(nilai);
+
+            // Buat elemen tabel baru
+            var tableBody = document.getElementById('nilaiTableBody');
+            var row = document.createElement('tr');
+
+            // Tambahkan data ke dalam elemen tabel
+            row.innerHTML = `<td>${nim}</td><td>${nama}</td><td>${mataKuliah}</td><td>${sks}</td><td>${nilai}</td><td>${angkaKualitas.toFixed(2)}</td><td>${grade}</td>`;
+            tableBody.appendChild(row);
+
+            // Reset form
+            document.getElementById('nilaiForm').reset();
+
+            // Perbarui IPK
+            hitungIPK();
+        }
+
+        function getGrade(nilai) {
+            if (nilai >= 85) return 'A';
+            if (nilai >= 70) return 'B';
+            if (nilai >= 55) return 'C';
+            if (nilai >= 40) return 'D';
+            return 'E';
+        }
+
+        function hitungIPK() {
+            if (totalSKS > 0) {
+                var ipk = totalNilai / totalSKS;
+                document.getElementById('ipkResult').innerText = 'IPK: ' + ipk.toFixed(2);
+            } else {
+                document.getElementById('ipkResult').innerText = 'IPK: 0';
+            }
+        }
+    </script>
+
+</body>
+</html>
