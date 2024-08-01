@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Nilai</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+        }
+        table, th, td {
+            border: 1px solid black;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+        }
+        input[type="text"], input[type="number"], select {
+            width: 100%;
+            box-sizing: border-box;
+        }
+        select {
+            padding: 5px;
+        }
+        .center {
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<div class="center">
+    <h2>Kelola Nilai</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>No.</th>
+                <th>Mata Kuliah</th>
+                <th>SKS</th>
+                <th>Nilai</th>
+                <th>Grade</th>
+                <th>Aksi</th>
+            </tr>
+        </thead>
+        <tbody id="courseTable">
+            <tr>
+                <td></td>
+                <td><input type="text" id="courseName" placeholder="Nama Mata Kuliah"></td>
+                <td><input type="number" id="sks" placeholder="SKS" min="1" max="4"></td>
+                <td><input type="number" id="nilai" placeholder="Nilai" min="0" max="100"></td>
+                <td>
+                    <select id="grade">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="E">E</option>
+                    </select>
+                </td>
+                <td><button onclick="addCourse()">Tambah</button></td>
+            </tr>
+        </tbody>
+    </table>
+    <p>Indeks Prestasi: <span id="performanceIndex">0.00</span></p>
+</div>
+
+<script>
+    let courses = [];
+
+    function addCourse() {
+        const courseName = document.getElementById('courseName').value;
+        const sks = parseInt(document.getElementById('sks').value);
+        const nilai = parseInt(document.getElementById('nilai').value);
+        const grade = document.getElementById('grade').value;
+
+        if (courseName && sks && nilai && grade) {
+            courses.push({ courseName, sks, nilai, grade });
+            renderTable();
+            calculatePerformanceIndex();
+        } else {
+            alert("Semua field harus diisi!");
+        }
+    }
+
+    function renderTable() {
+        const table = document.getElementById('courseTable');
+        table.innerHTML = `
+            <tr>
+                <td></td>
+                <td><input type="text" id="courseName" placeholder="Nama Mata Kuliah"></td>
+                <td><input type="number" id="sks" placeholder="SKS" min="1" max="4"></td>
+                <td><input type="number" id="nilai" placeholder="Nilai" min="0" max="100"></td>
+                <td>
+                    <select id="grade">
+                        <option value="A">A</option>
+                        <option value="B">B</option>
+                        <option value="C">C</option>
+                        <option value="D">D</option>
+                        <option value="E">E</option>
+                    </select>
+                </td>
+                <td><button onclick="addCourse()">Tambah</button></td>
+            </tr>
+        `;
+
+        courses.forEach((course, index) => {
+            const row = table.insertRow();
+            row.insertCell(0).innerHTML = index + 1; // Automatic index
+            row.insertCell(1).innerHTML = course.courseName;
+            row.insertCell(2).innerHTML = course.sks;
+            row.insertCell(3).innerHTML = course.nilai;
+            row.insertCell(4).innerHTML = course.grade;
+            row.insertCell(5).innerHTML = `
+                <button onclick="editCourse(${index})">Ubah</button>
+                <button onclick="deleteCourse(${index})">Hapus</button>
+            `;
+        });
+    }
+
+    function editCourse(index) {
+        const course = courses[index];
+        const newCourseName = prompt("Ubah Mata Kuliah menjadi:", course.courseName);
+        const newSKS = prompt("Ubah SKS menjadi:", course.sks);
+        const newNilai = prompt("Ubah Nilai menjadi:", course.nilai);
+        const newGrade = prompt("Ubah Grade menjadi (A/B/C/D/E):", course.grade);
+
+        if (newCourseName && newSKS && newNilai && newGrade) {
+            courses[index] = {
+                courseName: newCourseName,
+                sks: parseInt(newSKS),
+                nilai: parseInt(newNilai),
+                grade: newGrade.toUpperCase()
+            };
+            renderTable();
+            calculatePerformanceIndex();
+        }
+    }
+
+    function deleteCourse(index) {
+        courses.splice(index, 1);
+        renderTable();
+        calculatePerformanceIndex();
+    }
+
+    function calculatePerformanceIndex() {
+        let totalSKS = 0;
+        let totalGradePoints = 0;
+
+        courses.forEach(course => {
+            totalSKS += course.sks;
+            totalGradePoints += convertGradeToPoints(course.grade) * course.sks;
+        });
+
+        const performanceIndex = (totalGradePoints / totalSKS).toFixed(2);
+        document.getElementById('performanceIndex').innerText = isNaN(performanceIndex) ? '0.00' : performanceIndex;
+    }
+
+    function convertGradeToPoints(grade) {
+        switch (grade.toUpperCase()) {
+            case 'A': return 4.0;
+            case 'B': return 3.0;
+            case 'C': return 2.0;
+            case 'D': return 1.0;
+            case 'E': return 0.0;
+            default: return 0.0;
+        }
+    }
+</script>
+
+</body>
+</html>
